@@ -14,7 +14,6 @@ export function TypewriterHeading({
   className = "max-w-2xl text-center text-2xl leading-snug font-medium text-neutral-900",
 }: TypewriterHeadingProps) {
   const [count, setCount] = useState(0);
-  const done = count >= text.length;
 
   useEffect(() => {
     setCount(0);
@@ -41,9 +40,7 @@ export function TypewriterHeading({
       {text.slice(0, count)}
       <span
         aria-hidden
-        className={`ml-0.5 inline-block h-[1.1em] w-0.5 translate-y-[3px] bg-current ${
-          done ? "opacity-0" : "animate-pulse"
-        }`}
+        className="animate-caret-blink ml-0.5 inline-block h-[1.1em] w-0.5 translate-y-[3px] bg-current"
       />
     </h1>
   );
