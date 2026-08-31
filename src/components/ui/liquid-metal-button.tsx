@@ -7,13 +7,43 @@ interface LiquidMetalButtonProps {
   label?: string;
   onClick?: () => void;
   viewMode?: "text" | "icon";
+  theme?: "dark" | "light" | "glass";
 }
+
+const SURFACES = {
+  dark: {
+    background: "linear-gradient(180deg, #202020 0%, #000000 100%)",
+    fg: "#666666",
+    textShadow: "0px 1px 2px rgba(0, 0, 0, 0.5)",
+    iconShadow: "drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.5))",
+    backdropFilter: "none",
+  },
+  light: {
+    background: "linear-gradient(180deg, #ffffff 0%, #e9e9ec 100%)",
+    fg: "#1a1a1e",
+    textShadow: "0px 1px 1px rgba(255, 255, 255, 0.8)",
+    iconShadow: "drop-shadow(0px 1px 1px rgba(255, 255, 255, 0.8))",
+    backdropFilter: "none",
+  },
+  glass: {
+    background:
+      "linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 45%, rgba(255,255,255,0.03) 100%)",
+    fg: "#1a1a1e",
+    textShadow: "0px 1px 1px rgba(255, 255, 255, 0.6)",
+    iconShadow: "drop-shadow(0px 1px 1px rgba(255, 255, 255, 0.6))",
+    backdropFilter: "blur(4px) saturate(110%) brightness(1.06)",
+  },
+} as const;
+
+const SHADER_OPACITY = { dark: 0.6, light: 0.6, glass: 0.28 } as const;
 
 export function LiquidMetalButton({
   label = "Get Started",
   onClick,
   viewMode = "text",
+  theme = "dark",
 }: LiquidMetalButtonProps) {
+  const surface = SURFACES[theme];
   const [isHovered, setIsHovered] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
   const [ripples, setRipples] = useState<
@@ -102,7 +132,7 @@ export function LiquidMetalButton({
               u_offsetY: -0.1,
             },
             undefined,
-            0.6,
+            SHADER_OPACITY[theme],
           );
         }
       } catch (error) {
@@ -118,7 +148,7 @@ export function LiquidMetalButton({
         shaderMount.current = null;
       }
     };
-  }, []);
+  }, [theme]);
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -200,8 +230,8 @@ export function LiquidMetalButton({
               <Sparkles
                 size={16}
                 style={{
-                  color: "#666666",
-                  filter: "drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.5))",
+                  color: surface.fg,
+                  filter: surface.iconShadow,
                   transition: "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)",
                   transform: "scale(1)",
                 }}
@@ -211,9 +241,9 @@ export function LiquidMetalButton({
               <span
                 style={{
                   fontSize: "14px",
-                  color: "#666666",
+                  color: surface.fg,
                   fontWeight: 400,
-                  textShadow: "0px 1px 2px rgba(0, 0, 0, 0.5)",
+                  textShadow: surface.textShadow,
                   transition: "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)",
                   transform: "scale(1)",
                   whiteSpace: "nowrap",
@@ -244,7 +274,9 @@ export function LiquidMetalButton({
                 height: `${dimensions.innerHeight}px`,
                 margin: "2px",
                 borderRadius: "100px",
-                background: "linear-gradient(180deg, #202020 0%, #000000 100%)",
+                background: surface.background,
+                backdropFilter: surface.backdropFilter,
+                WebkitBackdropFilter: surface.backdropFilter,
                 boxShadow: isPressed
                   ? "inset 0px 2px 4px rgba(0, 0, 0, 0.4), inset 0px 1px 2px rgba(0, 0, 0, 0.3)"
                   : "none",

@@ -1,11 +1,7 @@
-import LiquidMetalButtonDemo from "@/components/liquid-metal-button-demo";
+import { Hero } from "@/components/hero";
 
 function App() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-neutral-100">
-      <LiquidMetalButtonDemo />
-    </main>
-  );
+  return <Hero />;
 }
 
 export default App;
