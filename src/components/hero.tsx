@@ -1,6 +1,6 @@
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Sparkles } from "lucide-react";
 import { useRef, useState } from "react";
-import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
+import { GlassButton } from "@/components/ui/glass-button";
 import { TypewriterHeading } from "@/components/typewriter-heading";
 import { useScrubVideo } from "@/hooks/use-scrub-video";
 
@@ -121,17 +121,20 @@ export function Hero() {
             className="mb-6 min-h-[54px] max-w-xl text-[clamp(18px,4vw,26px)] leading-snug font-normal text-black sm:mb-7"
           />
 
-          {/* Primary CTA — liquid metal button */}
+          {/* Primary CTA — glass button */}
           <div className="mb-4">
-            <LiquidMetalButton
-              label="Ask agents"
-              theme="glass"
+            <GlassButton
+              size="default"
+              contentClassName="flex items-center gap-2"
               onClick={() => {
                 document
                   .getElementById("actions")
                   ?.scrollIntoView({ behavior: "smooth" });
               }}
-            />
+            >
+              <span>Ask agents</span>
+              <Sparkles className="h-4 w-4" />
+            </GlassButton>
           </div>
 
           {/* Action pills */}
