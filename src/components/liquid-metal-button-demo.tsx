@@ -4,8 +4,8 @@ export default function LiquidMetalButtonDemo() {
   return (
     <div className="flex flex-col items-center justify-center gap-8 p-8">
       <div className="flex items-center gap-8">
-        <LiquidMetalButton label="Get Started" />
-        <LiquidMetalButton viewMode="icon" />
+        <LiquidMetalButton label="Get Started" theme="light" />
+        <LiquidMetalButton viewMode="icon" theme="light" />
       </div>
     </div>
   );

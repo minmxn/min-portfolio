@@ -1,6 +1,6 @@
 import { Check, Copy, Sparkles } from "lucide-react";
 import { useRef, useState } from "react";
-import { GlassButton } from "@/components/ui/glass-button";
+import { PastelGlassButton } from "@/components/ui/pastel-glass-button";
 import { TypewriterHeading } from "@/components/typewriter-heading";
 import { useScrubVideo } from "@/hooks/use-scrub-video";
 
@@ -121,20 +121,18 @@ export function Hero() {
             className="mb-6 min-h-[54px] max-w-xl text-[clamp(18px,4vw,26px)] leading-snug font-normal text-black sm:mb-7"
           />
 
-          {/* Primary CTA — glass button */}
+          {/* Primary CTA — pastel glass */}
           <div className="mb-4">
-            <GlassButton
-              size="default"
-              contentClassName="flex items-center gap-2"
+            <PastelGlassButton
+              label="Ask agents"
+              icon={<Sparkles className="h-4 w-4" />}
+              className="aurora-button--cta"
               onClick={() => {
                 document
                   .getElementById("actions")
                   ?.scrollIntoView({ behavior: "smooth" });
               }}
-            >
-              <span>Ask agents</span>
-              <Sparkles className="h-4 w-4" />
-            </GlassButton>
+            />
           </div>
 
           {/* Action pills */}
@@ -162,6 +160,14 @@ export function Hero() {
           </div>
         </div>
       </section>
+
+      {/* Dev-only: jump to the button reference gallery */}
+      <a
+        href="#buttons"
+        className="fixed right-4 bottom-4 z-30 rounded-full border border-black/10 bg-white/70 px-3 py-1.5 font-mono text-[10px] tracking-widest text-black/50 uppercase backdrop-blur-sm transition-colors hover:text-black"
+      >
+        View button gallery →
+      </a>
     </div>
   );
 }
