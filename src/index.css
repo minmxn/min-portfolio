@@ -345,6 +345,25 @@
     text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
   }
 
+  /* Circular icon-only glass button (e.g. the A.R.I.A console send button).
+     Combine with .aurora-button--cta for the solid grey icon colour. */
+  .aurora-button--icon {
+    padding: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    /* Trim the CTA's big drop shadow so it sits neatly inside the composer. */
+    box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.25);
+  }
+  .aurora-button--icon .aurora-button__label {
+    gap: 0;
+  }
+  .aurora-button--icon:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
   /* ── Metallic frame wrapping a glass button ────────────────────────── */
   /* Wraps .aurora-button / .pastel-button in a brushed-metal rim. */
   .metal-frame {

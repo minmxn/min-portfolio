@@ -13,9 +13,10 @@ There is no test runner configured in this project.
 
 ## Architecture
 
-Single-page React 19 + TypeScript portfolio built with Vite 8 and Tailwind CSS v4. The app currently renders one screen: `App.tsx` returns only `<Hero />`.
+Single-page React 19 + TypeScript portfolio built with Vite 8 and Tailwind CSS v4.
 
-- **Entry flow:** `src/main.tsx` → `src/App.tsx` → `src/components/hero.tsx`. `hero.tsx` is the whole page — nav, mobile menu, the mouse-scrubbed character video, typewriter copy, CTA, and action pills. Hero content (nav links, action pills, email) lives in module-level constants at the top of `hero.tsx`.
+- **Entry flow:** `src/main.tsx` → `src/App.tsx` → `src/components/hero.tsx`. `App.tsx` does minimal hash routing: `/#buttons` renders `ButtonGallery` (a reference gallery of button explorations, not part of the live site); anything else renders `<Hero />`. `hero.tsx` is the whole live page — nav, mobile menu, the mouse-scrubbed character video, typewriter copy, CTA, and action pills. Hero content (nav links, action pills, email) lives in module-level constants at the top of `hero.tsx`.
+- **Button explorations:** `src/components/ui/` holds a family of experimental button components (aurora, pastel-glass, metal-*, liquid-metal, glass). `src/components/button-gallery.tsx` showcases them all at `/#buttons`. The metal/liquid-metal buttons render WebGL surfaces via `@paper-design/shaders` (`ShaderMount`). Most of these are exploration scratch, not shipped in the hero — check what `hero.tsx` actually imports before assuming a button is live.
 - **Path alias:** `@/` maps to `src/` (declared in both `tsconfig.json` and `vite.config.ts` — keep them in sync).
 - **Video scrubbing:** `src/hooks/use-scrub-video.ts` maps the cursor's horizontal viewport position onto the `<video>` timeline (no autoplay — frames advance with pointer/touch movement). The video source is `/girl_animation.mp4`, served from `public/`, not imported.
 - **Typewriter:** `src/components/typewriter-heading.tsx` animates text reveal via an interval and keeps a CSS blinking caret (`animate-caret-blink`, defined in `index.css`) running after typing finishes.

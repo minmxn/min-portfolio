@@ -1,10 +1,11 @@
 import { Check, Copy, Sparkles } from "lucide-react";
 import { useRef, useState } from "react";
 import { PastelGlassButton } from "@/components/ui/pastel-glass-button";
+import { AriaConsole } from "@/components/aria-console";
+import { TopNav } from "@/components/top-nav";
 import { TypewriterHeading } from "@/components/typewriter-heading";
 import { useScrubVideo } from "@/hooks/use-scrub-video";
 
-const NAV_LINKS = ["Labs", "Studio", "Openings", "Shop"];
 const ACTION_PILLS = [
   "Pitch us an idea",
   "Come work here",
@@ -15,7 +16,7 @@ const EMAIL = "hello@mainframe.co";
 
 export function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [consoleOpen, setConsoleOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   useScrubVideo(videoRef);
 
@@ -37,69 +38,21 @@ export function Hero() {
         className="pointer-events-none fixed top-0 left-[12vw] z-0 h-full w-[77vw] translate-y-[2%] object-contain"
       />
 
-      {/* Top nav */}
+      {/* Top nav — wordmark left, minimal text links right */}
       <nav className="fixed inset-x-0 top-0 z-20 flex items-center justify-between px-5 py-4 sm:px-8">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col leading-tight">
           <span
-            className="text-[21px] font-medium tracking-tight sm:text-[26px]"
+            className="text-[20px] font-bold tracking-tight text-neutral-900 sm:text-[24px]"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            Mainframe®
+            Seet Min Yi
           </span>
-          <span className="text-[25px] leading-none select-none sm:text-[30px]">✳︎</span>
+          <span className="font-mono text-[9px] tracking-[0.16em] text-neutral-400 uppercase sm:text-[11px]">
+            Business Analyst · Product Thinker
+          </span>
         </div>
-
-        <div className="hidden items-center text-[23px] md:flex">
-          {NAV_LINKS.map((link, i) => (
-            <span key={link}>
-              <a href="#" className="transition-opacity hover:opacity-60">
-                {link}
-              </a>
-              {i < NAV_LINKS.length - 1 && <span>,&nbsp;</span>}
-            </span>
-          ))}
-        </div>
-
-        <button
-          type="button"
-          aria-label="Menu"
-          onClick={() => setMenuOpen((o) => !o)}
-          className="flex flex-col gap-[5px] p-2 md:hidden"
-        >
-          <span
-            className={`h-0.5 w-6 bg-black transition-all ${menuOpen ? "translate-y-[7px] rotate-45" : ""}`}
-          />
-          <span className={`h-0.5 w-6 bg-black transition-all ${menuOpen ? "opacity-0" : ""}`} />
-          <span
-            className={`h-0.5 w-6 bg-black transition-all ${menuOpen ? "-translate-y-[7px] -rotate-45" : ""}`}
-          />
-        </button>
+        <TopNav />
       </nav>
-
-      {/* Mobile overlay menu */}
-      <div
-        className={`fixed inset-0 z-10 flex flex-col items-start justify-center gap-8 bg-white/95 px-8 backdrop-blur-sm transition-opacity md:hidden ${
-          menuOpen ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
-      >
-        {NAV_LINKS.map((link) => (
-          <a
-            key={link}
-            href="#"
-            onClick={() => setMenuOpen(false)}
-            className="text-[32px] font-medium"
-          >
-            {link}
-          </a>
-        ))}
-        <a
-          href="#"
-          onClick={() => setMenuOpen(false)}
-          className="text-[32px] font-medium underline underline-offset-2"
-        >
-          Get in touch
-        </a>
-      </div>
 
       {/* Hero content */}
       <section className="relative z-[1] flex min-h-screen flex-col justify-end px-5 pb-12 sm:px-8 md:justify-center md:px-10">
@@ -127,11 +80,7 @@ export function Hero() {
               label="Ask agents"
               icon={<Sparkles className="h-4 w-4" />}
               className="aurora-button--cta"
-              onClick={() => {
-                document
-                  .getElementById("actions")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }}
+              onClick={() => setConsoleOpen(true)}
             />
           </div>
 
@@ -168,6 +117,9 @@ export function Hero() {
       >
         View button gallery →
       </a>
+
+      {/* A.R.I.A chat console */}
+      <AriaConsole open={consoleOpen} onClose={() => setConsoleOpen(false)} />
     </div>
   );
 }
