@@ -15,21 +15,21 @@ interface AriaConsoleProps {
 
 /** Conversation starters — mirror the hero's action pills. */
 const SUGGESTIONS = [
-  "Pitch us an idea",
-  "Come work here",
-  "What does Mainframe do?",
+  "What has Min Yi built?",
+  "Tell me about Nomo",
+  "How do I get in touch?",
 ];
 
 const GREETING =
-  "Hi, I'm A.R.I.A — Mainframe's Adaptive Response Interface Agent. Ask me anything about the studio, our work, or how to get in touch.";
+  "Hi, I'm A.R.I.A, Min Yi's portfolio assistant. Ask me anything about the work, the projects, or how to get in touch.";
 
 /**
  * Placeholder "brain". Swap the body for a real API call — return the
  * assistant's reply as a string (or stream it) and the UI stays the same.
  */
-async function askAria(prompt: string): Promise<string> {
+async function askAria(_prompt: string): Promise<string> {
   await new Promise((r) => setTimeout(r, 700 + Math.random() * 500));
-  return `You said: "${prompt}". I'm running in demo mode right now — wire me to your model in askAria() and I'll answer for real.`;
+  return "Thanks for asking! I'm a lightweight demo assistant on Min Yi's portfolio, so I can't fully answer that just yet. In the meantime, take a look at the Work page, or reach Min Yi directly at seetminyi.work@gmail.com.";
 }
 
 export function AriaConsole({ open, onClose }: AriaConsoleProps) {

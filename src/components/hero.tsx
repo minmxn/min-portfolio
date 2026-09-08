@@ -7,12 +7,15 @@ import { TypewriterHeading } from "@/components/typewriter-heading";
 import { useScrubVideo } from "@/hooks/use-scrub-video";
 
 const ACTION_PILLS = [
-  "Pitch us an idea",
-  "Come work here",
-  "Send a brief hello",
-  "See how we operate",
+  { label: "See my work", href: "#work" },
+  { label: "The Nomo story", href: "#nomo" },
+  { label: "Generative video", href: "#kling" },
 ];
-const EMAIL = "hello@mainframe.co";
+const EMAIL = "seetminyi.work@gmail.com";
+
+// Shared pastel glow used across the site (Work page ambient background).
+const PASTEL =
+  "conic-gradient(from 0deg, #ffd1dc, #ffe0b3, #fff5ba, #c8f7d4, #b3e5ff, #d7c9ff, #ffd1dc)";
 
 export function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -28,6 +31,18 @@ export function Hero() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white text-neutral-900">
+      {/* Ambient background — matches the Work page (soft pastel glows) */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed -top-40 -right-32 z-0 h-[32rem] w-[32rem] rounded-full opacity-40 blur-[90px]"
+        style={{ background: PASTEL }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none fixed -bottom-48 -left-40 z-0 h-[30rem] w-[30rem] rounded-full opacity-30 blur-[100px]"
+        style={{ background: PASTEL }}
+      />
+
       {/* Character video (mouse-scrubbed) */}
       <video
         ref={videoRef}
@@ -50,12 +65,13 @@ export function Hero() {
           </div>
 
           <p className="mb-5 text-[clamp(18px,4vw,26px)] leading-tight sm:mb-6">
-            Hey there, meet A.R.I.A,
+            Hey there, I&apos;m Min Yi. Meet A.R.I.A,
             <br />
-            Mainframe&apos;s Adaptive Response Interface Agent
+            my portfolio&apos;s Adaptive Response Interface Agent
           </p>
 
           <TypewriterHeading
+            text="Ask A.R.I.A anything about my work, or take a look around."
             startDelay={500}
             speed={38}
             className="mb-6 min-h-[54px] max-w-xl text-[clamp(18px,4vw,26px)] leading-snug font-normal text-black sm:mb-7"
@@ -75,11 +91,11 @@ export function Hero() {
           <div id="actions" className="flex flex-wrap gap-y-1.5">
             {ACTION_PILLS.map((pill) => (
               <a
-                key={pill}
-                href="#"
+                key={pill.label}
+                href={pill.href}
                 className="mx-[3px] mb-1.5 inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-[0.3em] text-[13px] whitespace-nowrap text-black transition-colors hover:bg-black hover:text-white sm:px-5 sm:text-[15px]"
               >
-                {pill}
+                {pill.label}
               </a>
             ))}
             <button
@@ -88,7 +104,7 @@ export function Hero() {
               className="mx-[3px] mb-1.5 inline-flex items-center gap-2 rounded-full border border-black/10 bg-transparent px-4 py-[0.3em] text-[13px] whitespace-nowrap text-black transition-colors hover:bg-black hover:text-white sm:px-5 sm:text-[15px]"
             >
               <span>
-                Reach us:{" "}
+                Email me:{" "}
                 <span className="underline underline-offset-1">{EMAIL}</span>
               </span>
               {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}

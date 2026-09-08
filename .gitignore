@@ -25,3 +25,6 @@ dist-ssr
 
 # Claude Code local config
 .claude/
+
+# Local image backups (originals kept out of the deploy)
+image-originals/

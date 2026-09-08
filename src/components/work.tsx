@@ -58,7 +58,7 @@ const PROJECTS: Project[] = [
       "An AI news companion in Telegram: morning briefing, poll, quiz, and a swipeable reader. Designed, built, and run in production.",
     tags: ["AI Product", "Node.js", "Telegram"],
     href: "#nomo",
-    image: "/work/nomo-logo.png",
+    image: "/work/nomo-logo.webp",
     imageFit: "contain",
   },
   {
@@ -70,7 +70,7 @@ const PROJECTS: Project[] = [
       "A painterly clip made with Kling 3.0, treating character consistency as a product-thinking exercise.",
     tags: ["Kling 3.0", "Direction", "Video"],
     href: "#kling",
-    image: "/work/kling-prince-front.png",
+    image: "/work/kling-prince-front.webp",
   },
   {
     index: "03",

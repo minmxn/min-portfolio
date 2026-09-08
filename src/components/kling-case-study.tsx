@@ -9,15 +9,15 @@ const META = [
 
 const REFERENCES = [
   {
-    src: "/work/kling-prince-front.png",
+    src: "/work/kling-prince-front.webp",
     caption: "Prince, front. The seed every other shot references.",
   },
   {
-    src: "/work/kling-prince-side.png",
+    src: "/work/kling-prince-side.webp",
     caption: "Prince, side. Checks the silhouette against the seed.",
   },
   {
-    src: "/work/kling-fox-front.png",
+    src: "/work/kling-fox-front.webp",
     caption: "Fox, front. The Prince's companion in the story.",
   },
 ];
@@ -88,7 +88,7 @@ export function KlingCaseStudy() {
         <div className="mx-auto mt-10 w-full max-w-[300px] overflow-hidden rounded-2xl border border-black/10 bg-neutral-950 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.35)]">
           <video
             src="/work/the-little-prince.mp4"
-            poster="/work/kling-prince-front.png"
+            poster="/work/kling-prince-front.webp"
             controls
             playsInline
             className="w-full"
