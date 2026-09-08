@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import { motion } from "motion/react";
+import { AmbientBackground, PASTEL } from "@/components/ambient-background";
 import { SiteHeader } from "@/components/site-header";
 import { FeatureCarousel } from "@/components/ui/feature-carousel";
 
@@ -57,32 +58,10 @@ const MARQUEE = [
   "Oracle Cloud",
 ];
 
-const PASTEL =
-  "conic-gradient(from 0deg, #ffd1dc, #ffe0b3, #fff5ba, #c8f7d4, #b3e5ff, #d7c9ff, #ffd1dc)";
-
 export function Work() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-white text-neutral-900">
-      {/* (1) Ambient background: dot grid + soft pastel glow */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-0 opacity-[0.5]"
-        style={{
-          backgroundImage:
-            "radial-gradient(rgba(0,0,0,0.10) 1px, transparent 1px)",
-          backgroundSize: "22px 22px",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none fixed -top-40 -right-32 z-0 h-[32rem] w-[32rem] rounded-full opacity-40 blur-[90px]"
-        style={{ background: PASTEL }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none fixed -bottom-48 -left-40 z-0 h-[30rem] w-[30rem] rounded-full opacity-30 blur-[100px]"
-        style={{ background: PASTEL }}
-      />
+      <AmbientBackground />
 
       <SiteHeader />
 

@@ -2,6 +2,7 @@ import { Check, Copy, Sparkles } from "lucide-react";
 import { useRef, useState } from "react";
 import { PastelGlassButton } from "@/components/ui/pastel-glass-button";
 import { AriaConsole } from "@/components/aria-console";
+import { AmbientBackground } from "@/components/ambient-background";
 import { SiteHeader } from "@/components/site-header";
 import { TypewriterHeading } from "@/components/typewriter-heading";
 import { useScrubVideo } from "@/hooks/use-scrub-video";
@@ -12,10 +13,6 @@ const ACTION_PILLS = [
   { label: "Generative video", href: "#kling" },
 ];
 const EMAIL = "seetminyi.work@gmail.com";
-
-// Shared pastel glow used across the site (Work page ambient background).
-const PASTEL =
-  "conic-gradient(from 0deg, #ffd1dc, #ffe0b3, #fff5ba, #c8f7d4, #b3e5ff, #d7c9ff, #ffd1dc)";
 
 export function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -31,17 +28,8 @@ export function Hero() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white text-neutral-900">
-      {/* Ambient background — matches the Work page (soft pastel glows) */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed -top-40 -right-32 z-0 h-[32rem] w-[32rem] rounded-full opacity-40 blur-[90px]"
-        style={{ background: PASTEL }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none fixed -bottom-48 -left-40 z-0 h-[30rem] w-[30rem] rounded-full opacity-30 blur-[100px]"
-        style={{ background: PASTEL }}
-      />
+      {/* Ambient background (glows only; the character provides the texture) */}
+      <AmbientBackground dots={false} />
 
       {/* Character video (mouse-scrubbed) */}
       <video
