@@ -1,4 +1,6 @@
 import { ArrowLeft } from "lucide-react";
+import { AmbientBackground } from "@/components/ambient-background";
+import { Reveal } from "@/components/reveal";
 import { SiteHeader } from "@/components/site-header";
 
 const META = [
@@ -47,10 +49,11 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 export function KlingCaseStudy() {
   return (
-    <div className="relative min-h-screen bg-white text-neutral-900">
+    <div className="relative min-h-screen overflow-hidden bg-white text-neutral-900">
+      <AmbientBackground />
       <SiteHeader />
 
-      <main className="mx-auto max-w-4xl px-5 pt-28 pb-24 sm:px-8 sm:pt-32">
+      <main className="relative z-[1] mx-auto max-w-4xl px-5 pt-28 pb-24 sm:px-8 sm:pt-32">
         <a
           href="#work"
           className="group mb-8 inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.2em] text-neutral-400 uppercase transition-colors hover:text-neutral-900"
@@ -99,7 +102,7 @@ export function KlingCaseStudy() {
         </p>
 
         {/* Intent */}
-        <section className="mt-16 max-w-2xl">
+        <Reveal><section className="mt-16 max-w-2xl">
           <SectionLabel>The intent</SectionLabel>
           <p className="text-[17px] leading-relaxed text-neutral-600">
             I picked The Little Prince because it is a beloved painterly world,
@@ -108,10 +111,10 @@ export function KlingCaseStudy() {
             shots is the hard part. Framing it as a challenge up front turns the
             experiment into a product-thinking exercise, not just a demo.
           </p>
-        </section>
+        </section></Reveal>
 
         {/* Reference sheet */}
-        <section className="mt-16">
+        <Reveal><section className="mt-16">
           <SectionLabel>The reference sheet</SectionLabel>
           <div className="grid gap-4 sm:grid-cols-3">
             {REFERENCES.map((ref) => (
@@ -130,10 +133,10 @@ export function KlingCaseStudy() {
               </figure>
             ))}
           </div>
-        </section>
+        </section></Reveal>
 
         {/* Prompt pattern */}
-        <section className="mt-16 max-w-2xl">
+        <Reveal><section className="mt-16 max-w-2xl">
           <SectionLabel>The prompt pattern</SectionLabel>
           <p className="text-[17px] leading-relaxed text-neutral-600">
             A fixed style prompt plus varying scene prompts. The style prompt
@@ -164,10 +167,10 @@ export function KlingCaseStudy() {
               </p>
             </div>
           </div>
-        </section>
+        </section></Reveal>
 
         {/* Learnings */}
-        <section className="mt-16">
+        <Reveal><section className="mt-16">
           <SectionLabel>What I learned</SectionLabel>
           <div className="grid gap-6 sm:grid-cols-3">
             {LEARNINGS.map((l) => (
@@ -184,7 +187,7 @@ export function KlingCaseStudy() {
               </div>
             ))}
           </div>
-        </section>
+        </section></Reveal>
 
         {/* Footer credit + back */}
         <div className="mt-16 flex items-center justify-between border-t border-black/10 pt-6">

@@ -1,4 +1,6 @@
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { AmbientBackground } from "@/components/ambient-background";
+import { Reveal } from "@/components/reveal";
 import { SiteHeader } from "@/components/site-header";
 
 const BOT_URL = "https://t.me/nomogh_bot";
@@ -72,10 +74,11 @@ function Bullets({ items }: { items: string[] }) {
 
 export function NomoCaseStudy() {
   return (
-    <div className="relative min-h-screen bg-white text-neutral-900">
+    <div className="relative min-h-screen overflow-hidden bg-white text-neutral-900">
+      <AmbientBackground />
       <SiteHeader />
 
-      <main className="mx-auto max-w-4xl px-5 pt-28 pb-24 sm:px-8 sm:pt-32">
+      <main className="relative z-[1] mx-auto max-w-4xl px-5 pt-28 pb-24 sm:px-8 sm:pt-32">
         <a
           href="#work"
           className="group mb-8 inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.2em] text-neutral-400 uppercase transition-colors hover:text-neutral-900"
@@ -134,7 +137,7 @@ export function NomoCaseStudy() {
         </div>
 
         {/* Screenshots */}
-        <section className="mt-10">
+        <Reveal><section className="mt-10">
           <div className="grid gap-4 sm:grid-cols-3">
             {SHOTS.map((shot) => (
               <figure key={shot.src}>
@@ -152,10 +155,10 @@ export function NomoCaseStudy() {
               </figure>
             ))}
           </div>
-        </section>
+        </section></Reveal>
 
         {/* The problem */}
-        <section className="mt-16 max-w-2xl">
+        <Reveal><section className="mt-16 max-w-2xl">
           <SectionLabel>The problem</SectionLabel>
           <p className="text-[17px] leading-relaxed text-neutral-600">
             My friends and I (a group we call Market Kakis) wanted to keep up
@@ -163,10 +166,10 @@ export function NomoCaseStudy() {
             scrolling. General news apps hand you everything and prioritize
             nothing, so staying informed felt like a chore.
           </p>
-        </section>
+        </section></Reveal>
 
         {/* The idea */}
-        <section className="mt-14 max-w-2xl">
+        <Reveal><section className="mt-14 max-w-2xl">
           <SectionLabel>The idea</SectionLabel>
           <p className="text-[17px] leading-relaxed text-neutral-600">
             Deliver a small, curated, AI-summarized digest inside a chat app
@@ -174,16 +177,16 @@ export function NomoCaseStudy() {
             to build. The news comes to you, in Telegram, on a calm daily
             rhythm.
           </p>
-        </section>
+        </section></Reveal>
 
         {/* What it does */}
-        <section className="mt-14 max-w-2xl">
+        <Reveal><section className="mt-14 max-w-2xl">
           <SectionLabel>What it does</SectionLabel>
           <Bullets items={DOES} />
-        </section>
+        </section></Reveal>
 
         {/* How it works */}
-        <section className="mt-14 max-w-2xl">
+        <Reveal><section className="mt-14 max-w-2xl">
           <SectionLabel>How it works</SectionLabel>
           <p className="text-[17px] leading-relaxed text-neutral-600">
             A cron schedule posts on a calm daily rhythm (Singapore time): an 8am
@@ -194,16 +197,16 @@ export function NomoCaseStudy() {
             AI feature has a silent fallback so the bot never posts a blank
             screen.
           </p>
-        </section>
+        </section></Reveal>
 
         {/* Product decisions */}
-        <section className="mt-14 max-w-2xl">
+        <Reveal><section className="mt-14 max-w-2xl">
           <SectionLabel>Product decisions & tradeoffs</SectionLabel>
           <Bullets items={DECISIONS} />
-        </section>
+        </section></Reveal>
 
         {/* Outcome */}
-        <section className="mt-14 max-w-2xl">
+        <Reveal><section className="mt-14 max-w-2xl">
           <SectionLabel>Outcome & learnings</SectionLabel>
           <p className="text-[17px] leading-relaxed text-neutral-600">
             Nomo has run daily for a real audience since launch. Building it
@@ -212,16 +215,16 @@ export function NomoCaseStudy() {
             It gave me a concrete, shipped example of the product thinking I want
             to bring to a team.
           </p>
-        </section>
+        </section></Reveal>
 
         {/* What's next */}
-        <section className="mt-14 max-w-2xl">
+        <Reveal><section className="mt-14 max-w-2xl">
           <SectionLabel>What is next</SectionLabel>
           <p className="text-[17px] leading-relaxed text-neutral-600">
             Add lightweight usage analytics so decisions are driven by data
             rather than guesses, and broaden the range of trusted sources.
           </p>
-        </section>
+        </section></Reveal>
 
         {/* Footer */}
         <div className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-black/10 pt-6">
