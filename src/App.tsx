@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Hero } from "@/components/hero";
+import { Work } from "@/components/work";
+import { KlingCaseStudy } from "@/components/kling-case-study";
+import { NomoCaseStudy } from "@/components/nomo-case-study";
 import { ButtonGallery } from "@/components/button-gallery";
 
 function App() {
-  // Simple hash routing: /#buttons shows the reference gallery, everything
-  // else shows the live site.
+  // Simple hash routing: /#work shows the Work view, /#buttons the reference
+  // gallery, everything else the Hero.
   const [hash, setHash] = useState(window.location.hash);
   useEffect(() => {
     const onHashChange = () => setHash(window.location.hash);
@@ -13,6 +16,9 @@ function App() {
   }, []);
 
   if (hash === "#buttons") return <ButtonGallery />;
+  if (hash === "#work") return <Work />;
+  if (hash === "#kling") return <KlingCaseStudy />;
+  if (hash === "#nomo") return <NomoCaseStudy />;
   return <Hero />;
 }
 

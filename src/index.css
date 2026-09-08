@@ -443,6 +443,29 @@
   }
 }
 
+/* Continuous horizontal marquee (Work page toolkit strip). The track holds
+   two identical copies of the content; translating by -50% loops seamlessly. */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  display: inline-flex;
+  width: max-content;
+  animation: marquee-scroll 30s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
 @keyframes caret-blink {
   0%,
   100% {

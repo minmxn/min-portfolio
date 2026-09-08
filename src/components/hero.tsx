@@ -2,7 +2,7 @@ import { Check, Copy, Sparkles } from "lucide-react";
 import { useRef, useState } from "react";
 import { PastelGlassButton } from "@/components/ui/pastel-glass-button";
 import { AriaConsole } from "@/components/aria-console";
-import { TopNav } from "@/components/top-nav";
+import { SiteHeader } from "@/components/site-header";
 import { TypewriterHeading } from "@/components/typewriter-heading";
 import { useScrubVideo } from "@/hooks/use-scrub-video";
 
@@ -38,21 +38,8 @@ export function Hero() {
         className="pointer-events-none fixed top-0 left-[12vw] z-0 h-full w-[77vw] translate-y-[2%] object-contain"
       />
 
-      {/* Top nav — wordmark left, minimal text links right */}
-      <nav className="fixed inset-x-0 top-0 z-20 flex items-center justify-between px-5 py-4 sm:px-8">
-        <div className="flex flex-col leading-tight">
-          <span
-            className="text-[20px] font-bold tracking-tight text-neutral-900 sm:text-[24px]"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
-            Seet Min Yi
-          </span>
-          <span className="font-mono text-[9px] tracking-[0.16em] text-neutral-400 uppercase sm:text-[11px]">
-            Business Analyst · Product Thinker
-          </span>
-        </div>
-        <TopNav />
-      </nav>
+      {/* Top nav — identity left, text links right */}
+      <SiteHeader />
 
       {/* Hero content */}
       <section className="relative z-[1] flex min-h-screen flex-col justify-end px-5 pb-12 sm:px-8 md:justify-center md:px-10">
