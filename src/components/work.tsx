@@ -1,5 +1,15 @@
-import { ArrowRight, ArrowUpRight, MonitorSmartphone } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { motion } from "motion/react";
 import { SiteHeader } from "@/components/site-header";
+import { FeatureCarousel } from "@/components/ui/feature-carousel";
+
+// Scroll-reveal: fade + rise each section as it enters the viewport.
+const reveal = {
+  initial: { opacity: 0, y: 28 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-60px" as const },
+  transition: { duration: 0.6, ease: "easeOut" as const },
+};
 
 /* ---- data (same content as the live Work page) ---------------------- */
 
@@ -34,56 +44,6 @@ const CAREER: CareerItem[] = [
   },
 ];
 
-type Project = {
-  index: string;
-  category: string;
-  status: "Live" | "Experiment";
-  name: string;
-  description: string;
-  tags: string[];
-  href: string;
-  external?: boolean;
-  image?: string;
-  /** "cover" (default) fills the frame; "contain" fits a logo without cropping. */
-  imageFit?: "cover" | "contain";
-};
-
-const PROJECTS: Project[] = [
-  {
-    index: "01",
-    category: "Product",
-    status: "Live",
-    name: "Nomo News Bot",
-    description:
-      "An AI news companion in Telegram: morning briefing, poll, quiz, and a swipeable reader. Designed, built, and run in production.",
-    tags: ["AI Product", "Node.js", "Telegram"],
-    href: "#nomo",
-    image: "/work/nomo-logo.webp",
-    imageFit: "contain",
-  },
-  {
-    index: "02",
-    category: "Generative AI",
-    status: "Experiment",
-    name: "The Little Prince",
-    description:
-      "A painterly clip made with Kling 3.0, treating character consistency as a product-thinking exercise.",
-    tags: ["Kling 3.0", "Direction", "Video"],
-    href: "#kling",
-    image: "/work/kling-prince-front.webp",
-  },
-  {
-    index: "03",
-    category: "Web",
-    status: "Live",
-    name: "This Portfolio",
-    description:
-      "The site you're reading: a React 19 + Vite build with a mouse-scrubbed character and a glass A.R.I.A console.",
-    tags: ["React", "Vite", "Tailwind"],
-    href: "#home",
-  },
-];
-
 const MARQUEE = [
   "Business Analysis",
   "Requirements",
@@ -99,23 +59,6 @@ const MARQUEE = [
 
 const PASTEL =
   "conic-gradient(from 0deg, #ffd1dc, #ffe0b3, #fff5ba, #c8f7d4, #b3e5ff, #d7c9ff, #ffd1dc)";
-
-function StatusPill({ status }: { status: Project["status"] }) {
-  const styles =
-    status === "Live"
-      ? "bg-emerald-100 text-emerald-700"
-      : "bg-amber-100 text-amber-700";
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-mono text-[9px] tracking-[0.16em] uppercase ${styles}`}
-    >
-      <span
-        className={`h-1.5 w-1.5 rounded-full ${status === "Live" ? "bg-emerald-500" : "bg-amber-500"}`}
-      />
-      {status}
-    </span>
-  );
-}
 
 export function Work() {
   return (
@@ -145,7 +88,10 @@ export function Work() {
 
       <main className="relative z-[1] mx-auto max-w-6xl px-5 pt-28 pb-32 sm:px-8 sm:pt-32">
         {/* (5) Intro hero band on a glass panel */}
-        <section className="relative overflow-hidden rounded-3xl border border-white/70 bg-white/60 p-8 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.25)] backdrop-blur-xl sm:p-12">
+        <motion.section
+          {...reveal}
+          className="relative overflow-hidden rounded-3xl border border-white/70 bg-white/60 p-8 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.25)] backdrop-blur-xl sm:p-12"
+        >
           <div
             aria-hidden
             className="pointer-events-none absolute -top-16 -right-10 h-52 w-52 rounded-full opacity-50 blur-3xl"
@@ -183,10 +129,10 @@ export function Work() {
               ))}
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* (6) Career — current role gets an emerald card */}
-        <section className="mt-16">
+        <motion.section {...reveal} className="mt-16">
           <div className="mb-6 flex items-center justify-between border-b border-black/10 pb-2">
             <span className="font-mono text-[11px] tracking-[0.24em] text-black/50 uppercase">
               Career
@@ -229,10 +175,10 @@ export function Work() {
               </div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        {/* (2)(3)(4) Personal Projects — image-forward cards */}
-        <section className="mt-16">
+        {/* Personal Projects — carousel */}
+        <motion.section {...reveal} className="mt-16">
           <div className="mb-6 flex items-center justify-between border-b border-black/10 pb-2">
             <span className="font-mono text-[11px] tracking-[0.24em] text-black/50 uppercase">
               Personal Projects
@@ -242,95 +188,14 @@ export function Work() {
             </span>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {PROJECTS.map((p) => {
-              const external = p.href.startsWith("http");
-              return (
-                <a
-                  key={p.index}
-                  href={p.href}
-                  {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
-                  className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.2)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.3)]"
-                >
-                  {/* Image / placeholder */}
-                  <div
-                    className={`relative aspect-[4/3] overflow-hidden ${
-                      p.imageFit === "contain" ? "bg-white" : "bg-neutral-100"
-                    }`}
-                  >
-                    {p.image ? (
-                      <img
-                        src={p.image}
-                        alt={p.name}
-                        loading="lazy"
-                        className={`h-full w-full transition-transform duration-500 group-hover:scale-105 ${
-                          p.imageFit === "contain"
-                            ? "object-contain p-6"
-                            : "object-cover object-center"
-                        }`}
-                      />
-                    ) : (
-                      <div
-                        className="flex h-full w-full items-center justify-center"
-                        style={{ background: PASTEL, opacity: 0.85 }}
-                      >
-                        <MonitorSmartphone
-                          className="h-10 w-10 text-white/90"
-                          strokeWidth={1.4}
-                        />
-                      </div>
-                    )}
-                    {/* (4) big editorial index */}
-                    <span
-                      className="absolute top-2 left-3 text-[44px] leading-none font-bold text-white/80 mix-blend-overlay"
-                      style={{ fontFamily: '"Chakra Petch", sans-serif' }}
-                    >
-                      {p.index}
-                    </span>
-                    {/* (3) colored status pill */}
-                    <span className="absolute top-3 right-3">
-                      <StatusPill status={p.status} />
-                    </span>
-                  </div>
-
-                  {/* Text */}
-                  <div className="flex flex-1 flex-col p-5">
-                    <span className="font-mono text-[10px] tracking-[0.2em] text-black/45 uppercase">
-                      {p.index} · {p.category}
-                    </span>
-                    <h3
-                      className="mt-1.5 flex items-center gap-1.5 text-[20px] font-semibold tracking-tight"
-                      style={{ fontFamily: "var(--font-display)" }}
-                    >
-                      {p.name}
-                      {external ? (
-                        <ArrowUpRight className="h-4 w-4 text-neutral-400 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-emerald-600" />
-                      ) : (
-                        <ArrowRight className="h-4 w-4 text-neutral-400 transition-all group-hover:translate-x-0.5 group-hover:text-emerald-600" />
-                      )}
-                    </h3>
-                    <p className="mt-2 text-[14px] leading-relaxed text-neutral-500">
-                      {p.description}
-                    </p>
-                    <div className="mt-4 flex flex-wrap gap-1.5 pt-1">
-                      {p.tags.map((t) => (
-                        <span
-                          key={t}
-                          className="rounded-full border border-black/10 bg-white px-2.5 py-1 font-mono text-[9px] tracking-[0.12em] text-black/55 uppercase"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-        </section>
+          <FeatureCarousel />
+        </motion.section>
 
         {/* Closing CTA */}
-        <section className="mt-20 overflow-hidden rounded-3xl border border-white/70 bg-neutral-900 p-8 sm:p-12">
+        <motion.section
+          {...reveal}
+          className="mt-20 overflow-hidden rounded-3xl border border-white/70 bg-neutral-900 p-8 sm:p-12"
+        >
           <div className="relative flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p
@@ -351,7 +216,7 @@ export function Work() {
               <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </a>
           </div>
-        </section>
+        </motion.section>
       </main>
 
       {/* Toolkit marquee */}
