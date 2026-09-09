@@ -29,7 +29,7 @@ export function Hero() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-white text-neutral-900">
       {/* Ambient background (glows only; the character provides the texture) */}
-      <AmbientBackground dots={false} />
+      <AmbientBackground dots={false} glows={false} />
 
       {/* Character video (mouse-scrubbed) */}
       <video
