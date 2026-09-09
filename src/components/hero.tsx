@@ -16,9 +16,11 @@ const EMAIL = "seetminyi.work@gmail.com";
 
 export function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const ctaRef = useRef<HTMLSpanElement>(null);
   const [consoleOpen, setConsoleOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  useScrubVideo(videoRef);
+  // Anchor the video's first frame to the "Ask agents" button position.
+  useScrubVideo(videoRef, ctaRef);
 
   const copyEmail = () => {
     navigator.clipboard?.writeText(EMAIL);
@@ -65,14 +67,17 @@ export function Hero() {
             className="mb-6 min-h-[54px] max-w-xl text-[clamp(18px,4vw,26px)] leading-snug font-normal text-black sm:mb-7"
           />
 
-          {/* Primary CTA — pastel glass */}
+          {/* Primary CTA — pastel glass. The inline-block span reports the
+              button's real position, which anchors the video scrub origin. */}
           <div className="mb-4">
-            <PastelGlassButton
-              label="Ask agents"
-              icon={<Sparkles className="h-4 w-4" />}
-              className="aurora-button--cta"
-              onClick={() => setConsoleOpen(true)}
-            />
+            <span ref={ctaRef} className="inline-block">
+              <PastelGlassButton
+                label="Ask agents"
+                icon={<Sparkles className="h-4 w-4" />}
+                className="aurora-button--cta"
+                onClick={() => setConsoleOpen(true)}
+              />
+            </span>
           </div>
 
           {/* Action pills */}

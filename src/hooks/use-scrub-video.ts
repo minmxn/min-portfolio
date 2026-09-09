@@ -4,8 +4,16 @@ import { useEffect, type RefObject } from "react";
  * Maps the cursor's horizontal position across the viewport onto the video
  * timeline, so the character animates as the pointer moves (ported from the
  * old static portfolio).
+ *
+ * `originRef` (optional) anchors the video's first frame (0s) to an element's
+ * left edge instead of the viewport's left edge: the cursor sitting on that
+ * element shows frame 0, and the animation plays out as the cursor moves right
+ * toward the viewport edge. Anything left of the origin holds on frame 0.
  */
-export function useScrubVideo(videoRef: RefObject<HTMLVideoElement | null>) {
+export function useScrubVideo<T extends HTMLElement = HTMLElement>(
+  videoRef: RefObject<HTMLVideoElement | null>,
+  originRef?: RefObject<T | null>,
+) {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -36,7 +44,14 @@ export function useScrubVideo(videoRef: RefObject<HTMLVideoElement | null>) {
 
     const scrubTo = (clientX: number) => {
       if (!video.duration || Number.isNaN(video.duration)) return;
-      const frac = Math.max(0, Math.min(1, clientX / window.innerWidth));
+      // Scrub origin (frame 0): the origin element's left edge if provided,
+      // otherwise the viewport's left edge.
+      const originX = originRef?.current
+        ? originRef.current.getBoundingClientRect().left
+        : 0;
+      const span = window.innerWidth - originX;
+      const frac =
+        span > 0 ? Math.max(0, Math.min(1, (clientX - originX) / span)) : 0;
       targetTime = frac * video.duration;
       if (!seeking) {
         seeking = true;
@@ -64,5 +79,5 @@ export function useScrubVideo(videoRef: RefObject<HTMLVideoElement | null>) {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("touchmove", onTouchMove);
     };
-  }, [videoRef]);
+  }, [videoRef, originRef]);
 }

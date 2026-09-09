@@ -1,5 +1,7 @@
 import { ArrowUp, Sparkles, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { PastelGlassButton } from "@/components/ui/pastel-glass-button";
 
@@ -188,8 +190,43 @@ export function AriaConsole({ open, onClose }: AriaConsoleProps) {
                 <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-black/10 bg-white/70">
                   <Sparkles className="h-3 w-3 text-black/60" />
                 </span>
-                <div className="max-w-[80%] rounded-2xl rounded-tl-sm border border-black/5 bg-white/80 px-3.5 py-2.5 text-[14px] leading-relaxed text-neutral-800">
-                  {m.text}
+                <div className="aria-prose max-w-[80%] rounded-2xl rounded-tl-sm border border-black/5 bg-white/80 px-3.5 py-2.5 text-[14px] leading-relaxed text-neutral-800">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      p: ({ children }) => (
+                        <p className="mb-2 last:mb-0">{children}</p>
+                      ),
+                      ul: ({ children }) => (
+                        <ul className="mb-2 list-disc space-y-1 pl-4 last:mb-0">
+                          {children}
+                        </ul>
+                      ),
+                      ol: ({ children }) => (
+                        <ol className="mb-2 list-decimal space-y-1 pl-4 last:mb-0">
+                          {children}
+                        </ol>
+                      ),
+                      li: ({ children }) => <li className="pl-0.5">{children}</li>,
+                      strong: ({ children }) => (
+                        <strong className="font-semibold text-neutral-900">
+                          {children}
+                        </strong>
+                      ),
+                      a: ({ children, href }) => (
+                        <a
+                          href={href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-emerald-700 underline underline-offset-2 hover:text-emerald-800"
+                        >
+                          {children}
+                        </a>
+                      ),
+                    }}
+                  >
+                    {m.text}
+                  </ReactMarkdown>
                 </div>
               </div>
             ) : (
