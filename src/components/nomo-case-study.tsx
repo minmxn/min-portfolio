@@ -226,8 +226,30 @@ export function NomoCaseStudy() {
           </p>
         </section></Reveal>
 
+        {/* Next project */}
+        <Reveal><a
+          href="#kling"
+          className="group mt-16 flex items-center justify-between gap-4 rounded-2xl border border-black/10 bg-neutral-50 p-6 transition-colors hover:border-emerald-500/40 hover:bg-emerald-50/40"
+        >
+          <div>
+            <div className="font-mono text-[10px] tracking-[0.2em] text-black/40 uppercase">
+              Next project
+            </div>
+            <div
+              className="mt-1 text-[20px] font-semibold tracking-tight"
+              style={{ fontFamily: '"Chakra Petch", sans-serif' }}
+            >
+              The Little Prince
+            </div>
+            <div className="mt-0.5 text-[14px] text-neutral-500">
+              A painterly generative-video clip made with Kling 3.0.
+            </div>
+          </div>
+          <ArrowUpRight className="h-6 w-6 shrink-0 text-neutral-400 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-emerald-600" />
+        </a></Reveal>
+
         {/* Footer */}
-        <div className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-black/10 pt-6">
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-black/10 pt-6">
           <a
             href={BOT_URL}
             target="_blank"
