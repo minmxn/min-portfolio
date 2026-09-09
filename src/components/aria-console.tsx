@@ -1,5 +1,6 @@
 import { ArrowUp, Sparkles, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { BorderBeam } from "@/components/ui/border-beam";
 import { PastelGlassButton } from "@/components/ui/pastel-glass-button";
 
 interface Message {
@@ -23,14 +24,8 @@ const SUGGESTIONS = [
 const GREETING =
   "Hi, I'm A.R.I.A, Min Yi's portfolio assistant. Ask me anything about the work, the projects, or how to get in touch.";
 
-/**
- * Placeholder "brain". Swap the body for a real API call — return the
- * assistant's reply as a string (or stream it) and the UI stays the same.
- */
-async function askAria(_prompt: string): Promise<string> {
-  await new Promise((r) => setTimeout(r, 700 + Math.random() * 500));
-  return "Thanks for asking! I'm a lightweight demo assistant on Min Yi's portfolio, so I can't fully answer that just yet. In the meantime, take a look at the Work page, or reach Min Yi directly at seetminyi.work@gmail.com.";
-}
+const FALLBACK_REPLY =
+  "Sorry — I couldn't reach the server just now. You can reach Min Yi directly at seetminyi.work@gmail.com.";
 
 export function AriaConsole({ open, onClose }: AriaConsoleProps) {
   const [messages, setMessages] = useState<Message[]>([
@@ -65,15 +60,52 @@ export function AriaConsole({ open, onClose }: AriaConsoleProps) {
     const trimmed = text.trim();
     if (!trimmed || thinking) return;
     const userMsg: Message = { id: idRef.current++, role: "user", text: trimmed };
-    setMessages((m) => [...m, userMsg]);
+    const history = [...messages, userMsg];
+    setMessages(history);
     setInput("");
     setThinking(true);
-    const reply = await askAria(trimmed);
-    setMessages((m) => [
-      ...m,
-      { id: idRef.current++, role: "agent", text: reply },
-    ]);
-    setThinking(false);
+
+    const agentId = idRef.current++;
+    try {
+      const res = await fetch("/api/aria", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // Send the conversation in Claude's format; drop the canned greeting
+        // (id 0) so the first message is a real user turn.
+        body: JSON.stringify({
+          messages: history
+            .filter((m) => m.id !== 0)
+            .map((m) => ({
+              role: m.role === "user" ? "user" : "assistant",
+              content: m.text,
+            })),
+        }),
+      });
+      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+
+      // First byte on the way — swap the typing dots for a live message.
+      setThinking(false);
+      setMessages((m) => [...m, { id: agentId, role: "agent", text: "" }]);
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let acc = "";
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        acc += decoder.decode(value, { stream: true });
+        setMessages((m) =>
+          m.map((msg) => (msg.id === agentId ? { ...msg, text: acc } : msg)),
+        );
+      }
+    } catch {
+      setMessages((m) => [
+        ...m.filter((msg) => msg.id !== agentId),
+        { id: agentId, role: "agent", text: FALLBACK_REPLY },
+      ]);
+    } finally {
+      setThinking(false);
+    }
   };
 
   return (
@@ -97,7 +129,7 @@ export function AriaConsole({ open, onClose }: AriaConsoleProps) {
       <div
         role="dialog"
         aria-label="A.R.I.A console"
-        className={`relative flex h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl border border-white/60 bg-white/70 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.35)] backdrop-blur-2xl backdrop-saturate-150 transition-all duration-300 sm:h-[600px] sm:rounded-3xl ${
+        className={`relative flex h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl bg-white/70 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.35)] backdrop-blur-2xl backdrop-saturate-150 transition-all duration-300 sm:h-[600px] sm:rounded-3xl ${
           open
             ? "translate-y-0 opacity-100"
             : "translate-y-8 opacity-0"
@@ -111,6 +143,14 @@ export function AriaConsole({ open, onClose }: AriaConsoleProps) {
             background:
               "conic-gradient(from 0deg, #ffd1dc, #ffe0b3, #fff5ba, #c8f7d4, #b3e5ff, #d7c9ff, #ffd1dc)",
           }}
+        />
+
+        {/* Pastel beam riding the border — speeds up while A.R.I.A is thinking */}
+        <BorderBeam
+          radius={24}
+          thickness={0.25}
+          glow={2}
+          duration={thinking ? 2.5 : 8}
         />
 
         {/* Header */}

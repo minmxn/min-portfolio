@@ -479,3 +479,22 @@
 .animate-caret-blink {
   animation: caret-blink 1s step-end infinite;
 }
+
+/* Border beam — a pastel light sweeping a rounded border. A conic gradient
+   rotates inside a mask that clips it to the border ring. Speed is driven by
+   --beam-duration so callers can ramp it live. */
+@keyframes border-beam-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.border-beam__sweep {
+  animation: border-beam-spin var(--beam-duration, 8s) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .border-beam__sweep {
+    animation: none;
+  }
+}
