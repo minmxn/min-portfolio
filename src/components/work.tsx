@@ -14,37 +14,6 @@ const reveal = {
 
 /* ---- data (same content as the live Work page) ---------------------- */
 
-type CareerItem = {
-  period: string;
-  title: string;
-  org: string;
-  current?: boolean;
-};
-
-const CAREER: CareerItem[] = [
-  {
-    period: "Jun 2026 - Now",
-    title: "Senior Business Architecture Analyst",
-    org: "Accenture · Full-time",
-    current: true,
-  },
-  {
-    period: "Sep 2024 - May 2026",
-    title: "Business Architecture Analyst",
-    org: "Accenture",
-  },
-  {
-    period: "Aug 2023 - Sep 2024",
-    title: "Functional Analyst",
-    org: "Accenture · Internship",
-  },
-  {
-    period: "Apr 2019 - Sep 2019",
-    title: "Software Engineer",
-    org: "Accenture · Internship",
-  },
-];
-
 const MARQUEE = [
   "Business Analysis",
   "Requirements",
@@ -107,52 +76,6 @@ export function Work() {
                 </span>
               ))}
             </div>
-          </div>
-        </motion.section>
-
-        {/* (6) Career — current role gets an emerald card */}
-        <motion.section {...reveal} className="mt-16">
-          <div className="mb-6 flex items-center justify-between border-b border-black/10 pb-2">
-            <span className="font-mono text-[11px] tracking-[0.24em] text-black/50 uppercase">
-              Career
-            </span>
-            <span className="font-mono text-[11px] tracking-[0.24em] text-black/30">
-              04
-            </span>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {CAREER.map((item) => (
-              <div
-                key={item.period}
-                className={`rounded-2xl border p-5 transition-shadow ${
-                  item.current
-                    ? "border-emerald-200 bg-emerald-50/80 shadow-[0_20px_40px_-24px_rgba(16,185,129,0.5)]"
-                    : "border-black/10 bg-white/70"
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`h-2 w-2 rounded-full ${
-                      item.current
-                        ? "bg-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,0.2)]"
-                        : "bg-neutral-300"
-                    }`}
-                  />
-                  <span className="font-mono text-[10px] tracking-[0.18em] text-black/45 uppercase">
-                    {item.period}
-                  </span>
-                </div>
-                <div
-                  className="mt-3 text-[16px] leading-tight font-semibold tracking-tight"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  {item.title}
-                </div>
-                <div className="mt-1 text-[13px] text-neutral-500">
-                  {item.org}
-                </div>
-              </div>
-            ))}
           </div>
         </motion.section>
 
