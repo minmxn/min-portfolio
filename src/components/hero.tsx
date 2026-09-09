@@ -34,7 +34,7 @@ export function Hero() {
       {/* Character video (mouse-scrubbed) */}
       <video
         ref={videoRef}
-        src="/girl_animation.mp4"
+        src="/hero_animation.mp4"
         muted
         playsInline
         preload="auto"
