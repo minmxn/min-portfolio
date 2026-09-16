@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { AmbientBackground, PASTEL } from "@/components/ambient-background";
 import { SiteHeader } from "@/components/site-header";
 import { FeatureCarousel } from "@/components/ui/feature-carousel";
+import { SKILLS } from "@/content/portfolio";
 
 // Scroll-reveal: fade + rise each section as it enters the viewport.
 const reveal = {
@@ -14,18 +15,7 @@ const reveal = {
 
 /* ---- data (same content as the live Work page) ---------------------- */
 
-const MARQUEE = [
-  "Business Analysis",
-  "Requirements",
-  "UAT",
-  "Stakeholder Mgmt",
-  "Agile Delivery",
-  "Node.js",
-  "LLM Integration",
-  "APIs",
-  "Prompt Engineering",
-  "Oracle Cloud",
-];
+const MARQUEE = SKILLS;
 
 export function Work() {
   return (

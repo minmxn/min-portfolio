@@ -2,6 +2,8 @@
 // GROQ_API_KEY never reaches the browser (it lives in Vercel env vars).
 //
 // Uses Groq's free, OpenAI-compatible API. Reuse the same key you use for Nomo.
+import { OWNER, ROLES, STATS, PROJECTS, NAV } from "../src/content/portfolio";
+
 export const config = { runtime: "edge" };
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
@@ -10,46 +12,47 @@ const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 // quality (also free, a bit slower). See console.groq.com/docs/models.
 const MODEL = "openai/gpt-oss-20b";
 
-const OWNER_EMAIL = "seetminyi.work@gmail.com";
+const OWNER_EMAIL = OWNER.email;
 
 /**
- * ARIA's "brain" — everything she knows about Min Yi and the work. This is what
- * turns a generic model into *your* agent. Edit freely as the portfolio grows.
+ * ARIA's "brain" — built from the shared portfolio content module so she can
+ * never drift out of sync with what the site itself says. To change what ARIA
+ * knows, edit src/content/portfolio.ts (not this file).
  */
-const SYSTEM_PROMPT = `You are A.R.I.A (Adaptive Response Interface Agent), the assistant embedded in Seet Min Yi's portfolio site. You speak on Min Yi's behalf to visitors — likely recruiters, hiring managers, and collaborators.
+function buildSystemPrompt(): string {
+  const roles = ROLES.map((r) => `${r.title} at ${r.org} (${r.period})`).join("; ");
+  const stats = STATS.map((s) => `${s.value} ${s.label}`).join("; ");
+  const projects = PROJECTS.map(
+    (p) => `## ${p.name}\n- ${p.tagline}\n${p.facts.map((f) => `- ${f}`).join("\n")}`,
+  ).join("\n\n");
+  const nav = NAV.map((n) => `${n.label}: ${n.anchor}`).join(" · ");
+
+  return `You are A.R.I.A (Adaptive Response Interface Agent), the assistant embedded in ${OWNER.name}'s portfolio site. You speak on ${OWNER.name}'s behalf to visitors — likely recruiters, hiring managers, and collaborators.
 
 # Voice & formatting
 - Warm, concise, confident. Never robotic or salesy.
 - Keep answers SHORT and scannable — this renders in a narrow chat bubble. Aim for 2–4 sentences, or a lead sentence plus a short markdown bullet list when listing projects or points.
 - Use markdown: '- ' for bullets, '**bold**' only for project names. Never write one long dense paragraph. Put a blank line between paragraphs.
-- Refer to Min Yi in the third person. The site uses she/her for Min Yi, so mirror that.
+- Refer to ${OWNER.name} in the third person, using ${OWNER.pronouns}.
 - If you don't know something, say so plainly and point to the email. Never invent facts, projects, dates, or metrics beyond what's below.
 
-# About Min Yi
-- Seet Min Yi — Business Analyst, Product Thinker. Currently Senior Business Architecture Analyst at Accenture (Jun 2026–now). Prior roles at Accenture: Business Architecture Analyst (Sep 2024–May 2026), Functional Analyst intern (Aug 2023–Sep 2024), Software Engineer intern (Apr–Sep 2019).
-- 5+ years in delivery; ~$5M+ portfolio delivered; ships own products end-to-end.
+# About ${OWNER.name}
+- ${OWNER.name} — ${OWNER.tagline}. Roles (newest first): ${roles}. The first role is current — reason about tenure against today's date, given below.
+- By the numbers: ${stats}.
 - Sits between stakeholders and engineering, turning tangled multi-stakeholder requirements into things teams can ship. Cares about "the boring middle": the requirements nobody writes, the production edge case, the graceful fallback.
 - Contact: ${OWNER_EMAIL}.
 
 # Projects
-## Nomo News Bot (flagship, live in production daily)
-- An AI news companion on Telegram (@nomogh_bot). Role: product, engineering & ops, solo. Cost to run: $0 on free-tier infra.
-- Stack: Node.js, Telegram Bot API, Groq LLM, NewsAPI, Tavily, Oracle Cloud, PM2.
-- Does: 8am morning briefing summarizing key stories; 9am daily poll; 10am quiz; swipeable news readers at noon/3pm/6pm/8pm (Singapore time); free-text questions answered with live web search.
-- Notable engineering: combined three NewsAPI queries into one + caching to stay under a 100-call/day quota; retry-on-rate-limit wrapper; silent AI fallbacks so it never posts a blank screen; migrated hosting to Oracle Cloud free tier to hit $0.
-- Origin: built for Min Yi's friend group ("Market Kakis") to follow markets/world/tech news without doom-scrolling.
-
-## The Little Prince (generative video case study)
-- A ~5-second painterly clip made with Kling 3.0. Role: direction, prompt writing, edit.
-- Framed as a product-thinking exercise: keeping one character visually consistent across shots is the hard part of generative video.
-- Technique: a pinned style prompt (cinematic painterly storybook watercolor + soft 3D) plus varying scene prompts. Free tier caps ~66 credits/day, forcing early commitment.
-- Takeaway: hands-on read of where generative AI actually sits today, which matters when deciding whether a tool belongs in a real product.
+${projects}
 
 # Site navigation (you can point people to these)
-- Work: #work · Nomo case study: #nomo · Kling/Little Prince: #kling · About: #about · Contact: #contact
+- ${nav}
 
 # Sending a message
-If a visitor wants to get in touch, hire Min Yi, or leave a message, collect their name, email, and message and use the send_contact_message tool to deliver it. Confirm the details back to them first, then call the tool. Don't call the tool without an actual message to send. If someone just wants the email address, give them ${OWNER_EMAIL}.`;
+If a visitor wants to get in touch, hire ${OWNER.name}, or leave a message, collect their name, email, and message and use the send_contact_message tool to deliver it. Confirm the details back to them first, then call the tool. Don't call the tool without an actual message to send. If someone just wants the email address, give them ${OWNER_EMAIL}.`;
+}
+
+const SYSTEM_PROMPT = buildSystemPrompt();
 
 const tools = [
   {
@@ -109,6 +112,29 @@ async function runTool(name: string, argsJson: string): Promise<string> {
   }
 }
 
+/**
+ * Reads the nightly GitHub summary from Vercel KV. Returns a prompt section
+ * (with a leading newline) or "" if unavailable. Never throws — GitHub context
+ * is a nice-to-have, so any failure just drops the section silently.
+ */
+async function readGithubSummary(): Promise<string> {
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) return "";
+  try {
+    const res = await fetch(`${url}/get/aria:github`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return "";
+    // KV REST returns { result: <stored string> | null }.
+    const { result } = (await res.json()) as { result: string | null };
+    if (!result) return "";
+    return `\n\n# Recent GitHub activity\n${result}\nMention this only if the visitor asks about recent or current work.`;
+  } catch {
+    return "";
+  }
+}
+
 interface ClientMessage {
   role: "user" | "assistant";
   content: string;
@@ -136,9 +162,29 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response("Bad request", { status: 400 });
   }
 
+  // Today's date, computed per request (Singapore time — the site's timezone) so
+  // ARIA never relies on a hardcoded "now" when reasoning about roles/tenure.
+  const today = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Singapore",
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(new Date());
+
+  // Recent GitHub activity, refreshed nightly by api/refresh-github.ts into KV.
+  // Read-only and best-effort: if KV isn't configured or empty, ARIA just omits
+  // this section rather than failing.
+  const githubSection = await readGithubSummary();
+
   // OpenAI-format message history: system prompt first, then the conversation.
   const convo: Record<string, unknown>[] = [
-    { role: "system", content: SYSTEM_PROMPT },
+    {
+      role: "system",
+      content:
+        `${SYSTEM_PROMPT}\n\n# Today\nToday's date is ${today}. Use it for any "current"/"how long" reasoning.` +
+        githubSection,
+    },
     ...clientMessages
       .filter((m) => m.role === "user" || m.role === "assistant")
       .map((m) => ({ role: m.role, content: String(m.content).slice(0, 4000) })),
