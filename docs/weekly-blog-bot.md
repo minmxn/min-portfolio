@@ -92,12 +92,15 @@ tags, excerpt, body, accent, kicker, links`). Publishing = move the draft's
 
 Read this before building or when something breaks.
 
-1. **Vercel Cron limits (check first).** Hobby plan caps cron jobs and runs them
-   at most once per day; there's a small quota. We already use one nightly cron
-   (`refresh-github`). Confirm a second weekly cron fits the plan before relying
-   on it. If not, options: fold blog generation into the existing nightly cron
-   but gate it to run only on, say, Mondays; or trigger via an external free
-   scheduler (GitHub Actions `schedule`) hitting the endpoint with `CRON_SECRET`.
+1. **Vercel Cron limits.** CONFIRMED 2026-09-17: account is on the **Hobby
+   plan**, which allows **2 cron jobs max, each at most once per day** (timing
+   not minute-precise). We already use 1 (`refresh-github`, nightly), so a weekly
+   blog cron would be 2/2 — it fits, but leaves zero spare slots.
+   **Decision: prefer the GitHub Actions fallback** — a free scheduled workflow
+   (`schedule:` cron) that pings the `write-blog` endpoint with `CRON_SECRET`.
+   GitHub Actions has unlimited free crons, so this keeps the 2nd Vercel slot
+   free and avoids the once-per-day timing fuzz. (Alt: fold generation into the
+   existing nightly Vercel cron, gated to run only on Mondays.)
 
 2. **Edge runtime vs. RSS/XML parsing.** The existing functions use
    `runtime: "edge"`. Edge has no Node `xml2js` etc. Parse RSS with a tiny
