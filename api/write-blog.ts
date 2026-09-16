@@ -25,8 +25,22 @@ function baseUrl(): string {
 }
 
 async function readGithubSummary(): Promise<string> {
-  const raw = await kvGet<string>("aria:github"); // stored as a raw string, not JSON
-  return typeof raw === "string" ? raw : "";
+  // aria:github is stored as a RAW (non-JSON) string by api/refresh-github.ts,
+  // so kvGet's JSON.parse would throw on it. Read it directly, mirroring
+  // api/aria.ts's readGithubSummary. Best-effort: any failure -> "".
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) return "";
+  try {
+    const res = await fetch(`${url}/get/aria:github`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return "";
+    const { result } = (await res.json()) as { result: string | null };
+    return typeof result === "string" && result.length > 0 ? result : "";
+  } catch {
+    return "";
+  }
 }
 
 async function emailDraft(post: Post, token: string): Promise<void> {
