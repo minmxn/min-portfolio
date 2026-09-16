@@ -1,6 +1,6 @@
 # Design doc — Weekly AI blog bot for the Lab page
 
-**Status:** Draft / not built yet
+**Status:** Design locked / not built yet
 **Owner:** Min Yi
 **Last updated:** 2026-09-17
 
@@ -21,6 +21,24 @@ grounded in real sources and reviewed by me before anything goes live.
   no new API keys.
 - **Images: keep the generated gradient covers.** The bot just picks an accent
   colour per post. No stock-photo sourcing, licensing, or attribution to manage.
+- **Trigger: GitHub Actions `schedule`, Monday 08:00 SGT** → pings
+  `/api/write-blog` with the `CRON_SECRET` bearer. Chosen over a second Vercel
+  cron (Hobby caps at one cron/day, already used by the nightly refresh) and
+  over folding into the nightly job (couples two concerns). `write-blog` runs as
+  a **Node serverless function** (not edge) so RSS/XML parsing is clean.
+- **Approval: Approve + Reject-and-rewrite.** Email has two links. Approve
+  publishes; Reject discards the draft, regenerates ONE fresh draft, and emails
+  it. Capped at **3 rewrites per week** to stay within Groq free-tier limits and
+  avoid a regenerate slot-machine.
+- **Seed posts stay code-only.** The 3 existing Lab posts remain the hardcoded
+  `POSTS` fallback (shown when KV is empty). No migration into KV. New posts
+  live in KV only.
+- **Draft expiry: 7 days.** Unapproved drafts auto-expire (a new one arrives
+  each Monday anyway), keeping KV clean.
+- **Source list:** Hacker News (top AI stories, past 7 days) + RSS from
+  Anthropic, OpenAI, GitHub, Simon Willison, Hugging Face, and Latent Space +
+  my GitHub weekly summary. The prompt picks the strongest **3–5 items** across
+  all sources per post — no link dumps.
 
 ## What we already have (nothing new to buy)
 
@@ -38,18 +56,22 @@ This is mostly wiring together infra that already exists in this repo:
 ## Architecture
 
 ```
-Weekly Vercel Cron (e.g. Mon 08:00)  →  api/write-blog.ts
-  1. Fetch sources (server-side, free, no keys):
+GitHub Actions schedule (Mon 08:00 SGT)  →  POST /api/write-blog (CRON_SECRET)
+  1. Fetch sources (server-side, free, no keys; each try/catch'ed):
        • Hacker News Algolia API — top AI stories from the past week
-       • RSS: Anthropic / OpenAI / GitHub blogs (parse XML)
+       • RSS: Anthropic / OpenAI / GitHub / Simon Willison / Hugging Face /
+         Latent Space (parse XML in Node runtime)
        • My GitHub weekly summary (already in KV: aria:github)
-  2. Groq writes ONE draft in my voice → { title, excerpt, body, tags, links }
+  2. Groq picks the strongest 3–5 items and writes ONE draft in my voice
+       → { title, excerpt, body, tags, links }
        - reuse GROQ_API_KEY
        - bump model to openai/gpt-oss-120b for quality (still free)
        - pass the existing 3 Lab posts as STYLE EXAMPLES every run
-  3. Save to KV as a draft with a random approve token
-  4. Resend emails me: rendered draft + "Approve & publish" link
-  5. I click → api/approve-blog.ts validates token → flips status to published
+  3. Save to KV as a draft with a random single-use token; expires after 7 days
+  4. Resend emails me: rendered draft + "Approve & publish" + "Reject & rewrite"
+  5a. Approve → api/approve-blog.ts validates token → flips status to published
+  5b. Reject → discards draft, regenerates ONE fresh draft, emails it
+      (capped at 3 rewrites/week)
 Lab page reads published posts from api/posts.ts
   (falls back to the hardcoded POSTS array if KV is empty)
 ```
@@ -58,10 +80,10 @@ Lab page reads published posts from api/posts.ts
 
 | File | Responsibility |
 | --- | --- |
-| `api/write-blog.ts` | Cron handler: gather sources → Groq draft → save draft to KV → email me. Guarded by `CRON_SECRET`. |
-| `api/approve-blog.ts` | `GET /api/approve-blog?id=<id>&token=<token>` → validate → publish. |
+| `api/write-blog.ts` | Node handler: gather sources → Groq draft → save draft to KV (7-day expiry) → email me. Guarded by `CRON_SECRET`. Reused by the rewrite path. |
+| `api/approve-blog.ts` | Handles both actions via single-use token: `?action=approve` validates → publishes; `?action=reject` discards → regenerates one draft (max 3/week). |
 | `api/posts.ts` | Returns published posts as JSON for the Lab page. |
-| `vercel.json` | Add one weekly cron entry alongside the existing nightly one. |
+| `.github/workflows/write-blog.yml` | Weekly `schedule` (Mon 08:00 SGT) that POSTs `/api/write-blog` with the `CRON_SECRET` bearer. |
 | `src/components/lab.tsx` | Refactor: read posts from `api/posts.ts` at runtime; keep the current `POSTS` array as seed/fallback. |
 
 ### Proposed KV schema
@@ -157,7 +179,11 @@ A few focused hours. No new paid services.
 
 ## Open questions before building
 
-- Confirm Vercel plan allows a second cron (see gotcha #1).
-- Node vs. edge runtime for `write-blog` (see gotcha #2).
-- Should the existing 3 seed posts be migrated into KV, or stay code-only
-  fallbacks (see gotcha #5)?
+_All resolved (see "Decisions locked in"):_
+
+- ~~Confirm Vercel plan allows a second cron.~~ → Using GitHub Actions
+  `schedule` instead, so Vercel cron limits don't apply (gotcha #1).
+- ~~Node vs. edge runtime for `write-blog`.~~ → **Node** serverless function
+  for clean RSS/XML parsing (gotcha #2).
+- ~~Migrate the 3 seed posts into KV?~~ → **No.** They stay code-only fallbacks
+  (gotcha #5).
