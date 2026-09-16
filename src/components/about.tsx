@@ -2,8 +2,9 @@ import { ArrowUpRight } from "lucide-react";
 import { AmbientBackground, PASTEL } from "@/components/ambient-background";
 import { Reveal } from "@/components/reveal";
 import { SiteHeader } from "@/components/site-header";
+import { OWNER, ROLES, STATS } from "@/content/portfolio";
 
-const EMAIL = "seetminyi.work@gmail.com";
+const EMAIL = OWNER.email;
 
 // How I work — approach, not a resume dump. Edit freely.
 const APPROACH = [
@@ -18,38 +19,6 @@ const APPROACH = [
   {
     title: "Prove the thinking by shipping",
     body: "I build my own products end to end — design, code, and run them in production — so ideas hold up all the way to something real.",
-  },
-];
-
-// By-the-numbers cards. Confirm/adjust these figures before publishing.
-const STATS = [
-  { value: "5+", label: "Years in delivery" },
-  { value: "$5M+", label: "Portfolio delivered" },
-  { value: "Live", label: "Products in production" },
-];
-
-// Career trajectory (mirrors the Work page's timeline, newest first).
-const TRAJECTORY = [
-  {
-    period: "Jun 2026 - Now",
-    title: "Senior Business Architecture Analyst",
-    org: "Accenture",
-    current: true,
-  },
-  {
-    period: "Sep 2024 - May 2026",
-    title: "Business Architecture Analyst",
-    org: "Accenture",
-  },
-  {
-    period: "Aug 2023 - Sep 2024",
-    title: "Functional Analyst",
-    org: "Accenture · Internship",
-  },
-  {
-    period: "Apr 2019 - Sep 2019",
-    title: "Software Engineer",
-    org: "Accenture · Internship",
   },
 ];
 
@@ -185,7 +154,7 @@ export function About() {
           <section className="mt-14">
             <SectionLabel>Trajectory</SectionLabel>
             <div className="border-t border-black/10">
-              {TRAJECTORY.map((item) => (
+              {ROLES.map((item) => (
                 <div
                   key={item.period}
                   className="flex flex-col gap-1 border-b border-black/10 py-5 sm:flex-row sm:items-baseline sm:gap-6"
