@@ -4,6 +4,7 @@ import { Work } from "@/components/work";
 import { KlingCaseStudy } from "@/components/kling-case-study";
 import { NomoCaseStudy } from "@/components/nomo-case-study";
 import { About } from "@/components/about";
+import { Lab } from "@/components/lab";
 import { Contact } from "@/components/contact";
 import { ButtonGallery } from "@/components/button-gallery";
 
@@ -20,6 +21,7 @@ function App() {
   if (hash === "#buttons") return <ButtonGallery />;
   if (hash === "#work") return <Work />;
   if (hash === "#about") return <About />;
+  if (hash === "#lab" || hash.startsWith("#lab/")) return <Lab />;
   if (hash === "#contact") return <Contact />;
   if (hash === "#kling") return <KlingCaseStudy />;
   if (hash === "#nomo") return <NomoCaseStudy />;
