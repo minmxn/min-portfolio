@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { AmbientBackground } from "@/components/ambient-background";
 import { Reveal } from "@/components/reveal";
@@ -6,6 +7,26 @@ import { useActiveHash } from "@/components/top-nav";
 import { type Post, POSTS } from "@/content/posts";
 
 const EMAIL = "seetminyi.work@gmail.com";
+
+// Published (KV) posts first, then seed posts, deduped by slug. If the fetch
+// fails or returns nothing, the page still shows the 3 seed posts.
+function useMergedPosts(): Post[] {
+  const [published, setPublished] = useState<Post[]>([]);
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/posts")
+      .then((r) => (r.ok ? r.json() : { posts: [] }))
+      .then((d: { posts?: Post[] }) => {
+        if (alive) setPublished(d.posts ?? []);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+  const seen = new Set(published.map((p) => p.slug));
+  return [...published, ...POSTS.filter((p) => !seen.has(p.slug))];
+}
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -85,13 +106,13 @@ function PageShell({ children }: { children: React.ReactNode }) {
 }
 
 // --- Feed (index) ----------------------------------------------------------
-function Feed({ activeTag }: { activeTag?: string }) {
+function Feed({ activeTag, posts }: { activeTag?: string; posts: Post[] }) {
   const visible = activeTag
-    ? POSTS.filter((p) => p.tags.includes(activeTag))
-    : POSTS;
+    ? posts.filter((p) => p.tags.includes(activeTag))
+    : posts;
 
   // Unique tags across all posts, in first-seen order, for the filter bar.
-  const allTags = [...new Set(POSTS.flatMap((p) => p.tags))];
+  const allTags = [...new Set(posts.flatMap((p) => p.tags))];
 
   return (
     <>
@@ -298,6 +319,7 @@ function PostDetail({ post }: { post: Post }) {
 
 export function Lab() {
   const hash = useActiveHash();
+  const posts = useMergedPosts();
   const rest = hash.startsWith("#lab/") ? hash.slice("#lab/".length) : "";
 
   // #lab/t/<tag> → filtered feed; #lab/<slug> → post detail; #lab → full feed.
@@ -305,11 +327,13 @@ export function Lab() {
     const activeTag = decodeURIComponent(rest.slice("t/".length));
     return (
       <PageShell>
-        <Feed activeTag={activeTag} />
+        <Feed activeTag={activeTag} posts={posts} />
       </PageShell>
     );
   }
 
-  const post = POSTS.find((p) => p.slug === rest);
-  return <PageShell>{post ? <PostDetail post={post} /> : <Feed />}</PageShell>;
+  const post = posts.find((p) => p.slug === rest);
+  return (
+    <PageShell>{post ? <PostDetail post={post} /> : <Feed posts={posts} />}</PageShell>
+  );
 }
