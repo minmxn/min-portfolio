@@ -7,7 +7,9 @@
 //   2. Set OWNER.githubUser in src/content/portfolio.ts.
 //   3. (Recommended) set a CRON_SECRET env var — Vercel sends it as a Bearer
 //      token so only Vercel's scheduler can trigger this endpoint.
-//   4. The schedule lives in vercel.json ("crons").
+//   4. (Required in prod) set GITHUB_TOKEN — a read-only PAT (public repos).
+//      GitHub 403s unauthenticated API calls from Vercel's cloud IPs.
+//   5. The schedule lives in vercel.json ("crons").
 export const config = { runtime: "edge" };
 
 import { OWNER } from "../src/content/portfolio";
@@ -25,17 +27,21 @@ interface Repo {
   stargazers_count: number;
 }
 
-/** Writes a value to Vercel KV via its REST API. */
+/**
+ * Writes a value to Upstash Redis (Vercel KV) via its REST API, using the
+ * command-array form (POST base URL with ["SET", key, value]). This is more
+ * robust than the path form for values containing newlines/special chars.
+ */
 async function kvSet(value: string): Promise<void> {
   const url = process.env.KV_REST_API_URL;
   const token = process.env.KV_REST_API_TOKEN;
   if (!url || !token) throw new Error("KV not configured");
-  const res = await fetch(`${url}/set/${KV_KEY}`, {
+  const res = await fetch(url, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-    body: value,
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify(["SET", KV_KEY, value]),
   });
-  if (!res.ok) throw new Error(`KV set failed: ${res.status}`);
+  if (!res.ok) throw new Error(`KV set failed: ${res.status} ${await res.text()}`);
 }
 
 export default async function handler(req: Request): Promise<Response> {
@@ -49,9 +55,18 @@ export default async function handler(req: Request): Promise<Response> {
   if (!user) return new Response("githubUser not set", { status: 200 });
 
   try {
+    // GitHub blocks unauthenticated API calls from cloud IPs (like Vercel's) with
+    // 403. A read-only token (public repos only) lifts that. Set GITHUB_TOKEN in
+    // Vercel env vars; without it we still try (works locally, may 403 in prod).
+    const ghHeaders: Record<string, string> = {
+      Accept: "application/vnd.github+json",
+      "User-Agent": "aria-portfolio",
+    };
+    if (process.env.GITHUB_TOKEN) ghHeaders.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+
     const res = await fetch(
       `https://api.github.com/users/${encodeURIComponent(user)}/repos?per_page=100&sort=pushed`,
-      { headers: { Accept: "application/vnd.github+json", "User-Agent": "aria-portfolio" } },
+      { headers: ghHeaders },
     );
     if (!res.ok) throw new Error(`GitHub HTTP ${res.status}`);
     const repos = (await res.json()) as Repo[];

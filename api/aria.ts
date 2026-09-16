@@ -122,8 +122,10 @@ async function readGithubSummary(): Promise<string> {
   const token = process.env.KV_REST_API_TOKEN;
   if (!url || !token) return "";
   try {
-    const res = await fetch(`${url}/get/aria:github`, {
-      headers: { Authorization: `Bearer ${token}` },
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify(["GET", "aria:github"]),
     });
     if (!res.ok) return "";
     // KV REST returns { result: <stored string> | null }.
