@@ -70,7 +70,7 @@ export function Hero() {
           {/* Primary CTA — pastel glass. The inline-block span reports the
               button's real position, which anchors the video scrub origin. */}
           <div className="mb-4">
-            <span ref={ctaRef} className="inline-block">
+            <span ref={ctaRef} className="metal-frame inline-flex">
               <PastelGlassButton
                 label="Ask agents"
                 icon={<Sparkles className="h-4 w-4" />}
