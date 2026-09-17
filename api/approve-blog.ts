@@ -28,18 +28,27 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (action === "approve") {
     const published = (await kvGet<Post[]>(PUBLISHED_KEY)) ?? [];
-    await kvSetJson(PUBLISHED_KEY, [draft.post, ...published]);
+    const deduped = published.filter((p) => p.slug !== draft.post.slug);
+    await kvSetJson(PUBLISHED_KEY, [draft.post, ...deduped]);
     await kvDel(DRAFT_KEY);
     return page("Published ✅", `“${draft.post.title}” is now live on your Lab page.`);
   }
 
   if (action === "reject") {
-    await kvDel(DRAFT_KEY);
-    const result = await runWriteBlog(true);
-    return page(
-      result.ok ? "Rewriting 🔁" : "That's this week's attempts",
-      result.ok ? "Discarded. A fresh draft is on its way to your inbox." : "The weekly rewrite cap is reached — see you next Monday.",
-    );
+    // Regenerate FIRST: runWriteBlog(true) overwrites DRAFT_KEY with a fresh
+    // record on success, so we must not delete the old draft beforehand (a
+    // failure would lose this week's post) or after (it would wipe the
+    // just-written new draft).
+    try {
+      const result = await runWriteBlog(true);
+      return page(
+        result.ok ? "Rewriting 🔁" : "That's this week's attempts",
+        result.ok ? "Discarded. A fresh draft is on its way to your inbox." : "The weekly rewrite cap is reached — see you next Monday.",
+      );
+    } catch (err) {
+      console.error("[approve-blog] reject/rewrite failed", err);
+      return page("Couldn't rewrite", "Something went wrong generating a fresh draft. Your current draft is still intact — try the link again, or wait for next Monday's draft.");
+    }
   }
 
   return page("Unknown action", "Use the buttons in the approval email.");
