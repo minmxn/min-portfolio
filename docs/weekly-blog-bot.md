@@ -187,3 +187,19 @@ _All resolved (see "Decisions locked in"):_
   for clean RSS/XML parsing (gotcha #2).
 - ~~Migrate the 3 seed posts into KV?~~ → **No.** They stay code-only fallbacks
   (gotcha #5).
+
+## Deployment / secrets
+
+Required environment setup:
+
+**GitHub Actions (repo secrets):**
+- `CRON_SECRET` — same bearer value as in Vercel env, checked by `/api/write-blog`
+- `SITE_URL` — production base URL (e.g. `https://<project>.vercel.app`), used by the workflow to trigger the endpoint
+
+**Vercel (env vars):**
+- `GROQ_API_KEY` — Groq free-tier API key (already present)
+- `KV_REST_API_URL` — Vercel KV REST endpoint (already present)
+- `KV_REST_API_TOKEN` — Vercel KV auth token (already present)
+- `RESEND_API_KEY` — Resend email API key (already present)
+- `CRON_SECRET` — bearer token for the GitHub Actions workflow (already present)
+- `SITE_URL` — optional; if not set, `VERCEL_PROJECT_PRODUCTION_URL` is used as a fallback
