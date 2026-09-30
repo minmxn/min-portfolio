@@ -1,6 +1,6 @@
 // Handles the two links in the approval email. Token is validated against the
 // single stored draft and consumed on use, so a stale/replayed link is inert.
-export const config = { runtime: "nodejs" };
+export const config = { runtime: "edge" };
 
 import type { Post } from "../src/content/posts";
 import { kvGet, kvSetJson, kvDel } from "./_lib/kv";

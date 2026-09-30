@@ -1,9 +1,8 @@
 // Weekly (Mon 08:00 SGT, via GitHub Actions) blog drafter. Gathers free
 // sources, asks Groq for one draft in Min Yi's voice, stores it with a
 // single-use token + 7-day expiry, and emails it for approval.
-export const config = { runtime: "nodejs" };
+export const config = { runtime: "edge" };
 
-import { randomUUID } from "node:crypto";
 import { OWNER } from "../src/content/portfolio";
 import { POSTS, type Post } from "../src/content/posts";
 import { gatherSources } from "./_lib/sources";
@@ -85,7 +84,7 @@ export async function runWriteBlog(rewrite: boolean): Promise<{ ok: boolean; mes
   const existingSlugs = [...published.map((p) => p.slug), ...POSTS.map((p) => p.slug)];
 
   const post = await generateDraft(sources, github, POSTS, existingSlugs);
-  const token = randomUUID().replace(/-/g, "");
+  const token = crypto.randomUUID().replace(/-/g, "");
   const record: DraftRecord = { post, token, createdAt: new Date().toISOString(), rewrites: rewrite ? attempts : 0 };
 
   await kvSetJson(DRAFT_KEY, record);

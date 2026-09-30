@@ -25,7 +25,11 @@ grounded in real sources and reviewed by me before anything goes live.
   `/api/write-blog` with the `CRON_SECRET` bearer. Chosen over a second Vercel
   cron (Hobby caps at one cron/day, already used by the nightly refresh) and
   over folding into the nightly job (couples two concerns). `write-blog` runs as
-  a **Node serverless function** (not edge) so RSS/XML parsing is clean.
+  an **edge function** — the same runtime as `aria.ts`/`refresh-github.ts`.
+  (Originally planned as Node for XML parsing, but RSS is parsed with plain
+  regex and the only Node API needed, `randomUUID`, exists as global Web
+  Crypto on edge. Vercel's Node runtime rejected the `Request`→`Response`
+  handler style with `FUNCTION_INVOCATION_FAILED`; edge accepts it.)
 - **Approval: Approve + Reject-and-rewrite.** Email has two links. Approve
   publishes; Reject discards the draft, regenerates ONE fresh draft, and emails
   it. Capped at **3 rewrites per week** to stay within Groq free-tier limits and

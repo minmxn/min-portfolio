@@ -1,6 +1,6 @@
 // Serves KV-published blog posts to the Lab page. Best-effort: returns an empty
 // list (never 500s) so the page can always fall back to seed posts.
-export const config = { runtime: "nodejs" };
+export const config = { runtime: "edge" };
 
 import { kvGet } from "./_lib/kv";
 import type { Post } from "../src/content/posts";
