@@ -37,8 +37,8 @@ grounded in real sources and reviewed by me before anything goes live.
   **3 rewrites per week**. (Switched from email/Resend to Telegram: Resend's free
   shared sender can only deliver to the account owner's own address and needs an
   account; Telegram is a free HTTPS API, edge-compatible, no spam folder, with
-  tappable buttons on mobile. Needs env vars `TELEGRAM_BOT_TOKEN` +
-  `TELEGRAM_CHAT_ID`.)
+  tappable buttons on mobile. Needs env vars `ARIA_TELEGRAM_BOT_TOKEN` +
+  `ARIA_TELEGRAM_CHAT_ID` — namespaced so they don't clash with other bots.)
 - **Seed posts stay code-only.** The 3 existing Lab posts remain the hardcoded
   `POSTS` fallback (shown when KV is empty). No migration into KV. New posts
   live in KV only.

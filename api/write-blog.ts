@@ -42,8 +42,8 @@ async function readGithubSummary(): Promise<string> {
 }
 
 async function notifyTelegram(post: Post, token: string): Promise<void> {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const botToken = process.env.ARIA_TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.ARIA_TELEGRAM_CHAT_ID;
   const base = baseUrl();
   const preview = `${base}/api/approve-blog?action=preview&token=${token}`;
   const approve = `${base}/api/approve-blog?action=approve&token=${token}`;
