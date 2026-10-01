@@ -1,5 +1,7 @@
-// Handles the two links in the approval email. Token is validated against the
-// single stored draft and consumed on use, so a stale/replayed link is inert.
+// Handles the links in the Telegram approval message: preview (read-only),
+// approve, and reject. Token is validated against the single stored draft and
+// consumed on approve/reject, so a stale/replayed link is inert. (preview does
+// not consume the token.)
 export const config = { runtime: "edge" };
 
 import type { Post } from "../src/content/posts";
@@ -24,6 +26,31 @@ export default async function handler(req: Request): Promise<Response> {
   const draft = await kvGet<DraftRecord>(DRAFT_KEY);
   if (!draft || !token || draft.token !== token) {
     return page("Link expired", "This draft is no longer available (already handled, or expired). A new draft arrives next Monday.");
+  }
+
+  if (action === "preview") {
+    // Read-only render of the full draft so it can be reviewed before
+    // approving. Does NOT consume the token or mutate anything.
+    const p = draft.post;
+    const esc = (s: string) =>
+      s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const bodyHtml = p.body.map((para) => `<p>${esc(para)}</p>`).join("");
+    const approve = `/api/approve-blog?action=approve&token=${token}`;
+    const reject = `/api/approve-blog?action=reject&token=${token}`;
+    return new Response(
+      `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(p.title)}</title>` +
+        `<body style="font-family:system-ui;max-width:42rem;margin:3rem auto;padding:0 1.25rem;line-height:1.6;color:#1a1a1a">` +
+        `<div style="font:600 12px/1 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:#059669">Draft preview</div>` +
+        `<h1 style="font-size:2rem;margin:.5rem 0">${esc(p.title)}</h1>` +
+        `<p style="color:#666;font-size:.9rem">${p.tags.map(esc).join(" · ")} · ${esc(p.readTime)}</p>` +
+        `<p style="font-size:1.15rem;color:#555"><em>${esc(p.excerpt)}</em></p>` +
+        bodyHtml +
+        `<div style="margin-top:2.5rem;display:flex;gap:.75rem;flex-wrap:wrap">` +
+        `<a href="${approve}" style="background:#059669;color:#fff;padding:.7rem 1.2rem;border-radius:.5rem;text-decoration:none">✅ Approve &amp; publish</a>` +
+        `<a href="${reject}" style="background:#f3f4f6;color:#111;padding:.7rem 1.2rem;border-radius:.5rem;text-decoration:none">🔁 Reject &amp; rewrite</a>` +
+        `</div></body>`,
+      { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } },
+    );
   }
 
   if (action === "approve") {

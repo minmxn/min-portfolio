@@ -1,9 +1,8 @@
 // Weekly (Mon 08:00 SGT, via GitHub Actions) blog drafter. Gathers free
 // sources, asks Groq for one draft in Min Yi's voice, stores it with a
-// single-use token + 7-day expiry, and emails it for approval.
+// single-use token + 7-day expiry, and sends it to Telegram for approval.
 export const config = { runtime: "edge" };
 
-import { OWNER } from "../src/content/portfolio";
 import { POSTS, type Post } from "../src/content/posts";
 import { gatherSources } from "./_lib/sources";
 import { generateDraft, isoWeek, type DraftRecord } from "./_lib/blog";
@@ -42,27 +41,36 @@ async function readGithubSummary(): Promise<string> {
   }
 }
 
-async function emailDraft(post: Post, token: string): Promise<void> {
-  const key = process.env.RESEND_API_KEY;
+async function notifyTelegram(post: Post, token: string): Promise<void> {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
   const base = baseUrl();
+  const preview = `${base}/api/approve-blog?action=preview&token=${token}`;
   const approve = `${base}/api/approve-blog?action=approve&token=${token}`;
   const reject = `${base}/api/approve-blog?action=reject&token=${token}`;
-  const bodyHtml = post.body.map((p) => `<p>${p}</p>`).join("");
-  const html = `<h1>${post.title}</h1><p><em>${post.excerpt}</em></p>${bodyHtml}
-    <p><strong>Tags:</strong> ${post.tags.join(", ")} · ${post.readTime}</p>
-    <p><a href="${approve}">✅ Approve &amp; publish</a> &nbsp;|&nbsp; <a href="${reject}">🔁 Reject &amp; rewrite</a></p>`;
-  if (!key) {
-    console.log("[write-blog] draft ready (no RESEND_API_KEY):", { approve, reject, title: post.title });
+  // Plain text (no parse_mode) so arbitrary titles/excerpts can't break
+  // Telegram's Markdown parser. Full body lives behind the "Read full draft"
+  // preview link (Telegram caps messages at ~4096 chars).
+  const text = `📝 New Lab draft\n\n${post.title}\n\n${post.excerpt}\n\nTags: ${post.tags.join(", ")} · ${post.readTime}`;
+  if (!botToken || !chatId) {
+    console.log("[write-blog] draft ready (no TELEGRAM creds):", { preview, approve, reject, title: post.title });
     return;
   }
-  await fetch("https://api.resend.com/emails", {
+  await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: "ARIA <onboarding@resend.dev>",
-      to: [OWNER.email],
-      subject: `Lab draft for review: ${post.title}`,
-      html,
+      chat_id: chatId,
+      text,
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "📄 Read full draft", url: preview }],
+          [
+            { text: "✅ Approve", url: approve },
+            { text: "🔁 Reject", url: reject },
+          ],
+        ],
+      },
     }),
   });
 }
@@ -91,7 +99,7 @@ export async function runWriteBlog(rewrite: boolean): Promise<{ ok: boolean; mes
   await kvExpire(DRAFT_KEY, DRAFT_TTL);
   await kvSetJson(attemptsKey, attempts + 1);
   await kvExpire(attemptsKey, DRAFT_TTL);
-  await emailDraft(post, token);
+  await notifyTelegram(post, token);
 
   return { ok: true, message: `Draft ready: ${post.title}` };
 }

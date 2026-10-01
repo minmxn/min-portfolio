@@ -30,10 +30,15 @@ grounded in real sources and reviewed by me before anything goes live.
   regex and the only Node API needed, `randomUUID`, exists as global Web
   Crypto on edge. Vercel's Node runtime rejected the `Request`→`Response`
   handler style with `FUNCTION_INVOCATION_FAILED`; edge accepts it.)
-- **Approval: Approve + Reject-and-rewrite.** Email has two links. Approve
-  publishes; Reject discards the draft, regenerates ONE fresh draft, and emails
-  it. Capped at **3 rewrites per week** to stay within Groq free-tier limits and
-  avoid a regenerate slot-machine.
+- **Approval: Approve + Reject-and-rewrite, delivered via Telegram.** The draft
+  is sent to a private Telegram chat (bot `@aria_blog_bot`) with three inline
+  buttons: Read full draft (preview), Approve, Reject. Approve publishes; Reject
+  discards the draft, regenerates ONE fresh draft, and sends it again. Capped at
+  **3 rewrites per week**. (Switched from email/Resend to Telegram: Resend's free
+  shared sender can only deliver to the account owner's own address and needs an
+  account; Telegram is a free HTTPS API, edge-compatible, no spam folder, with
+  tappable buttons on mobile. Needs env vars `TELEGRAM_BOT_TOKEN` +
+  `TELEGRAM_CHAT_ID`.)
 - **Seed posts stay code-only.** The 3 existing Lab posts remain the hardcoded
   `POSTS` fallback (shown when KV is empty). No migration into KV. New posts
   live in KV only.
